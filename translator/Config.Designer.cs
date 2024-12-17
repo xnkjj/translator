@@ -234,6 +234,37 @@ namespace translator
             }
         }
 
+        private bool ValidProxy(string p)
+        {
+            // allow empty proxy
+            if (string.IsNullOrEmpty(p))
+            {
+                return true;
+            }
+            // allow http and https proxy
+            if (p.StartsWith("http://") || p.StartsWith("https://"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool ValidOpenAIKey(string k)
+        {
+            // started with sk-
+            if (k.StartsWith("sk-"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool ValidPrompt(string p)
+        {
+            // don't allow empty prompt
+            return !string.IsNullOrEmpty(p);
+        }
+
         private string Translate(string text)
         {
             HttpClientHandler httpClientHandler = null;
@@ -302,9 +333,31 @@ namespace translator
         }
         private void ButtonSave_Click(object sender, EventArgs e)
         {
-            proxy = textBoxProxy.Text;
-            openAIKey = textBoxOpenAIKey.Text;
-            prompt = textBoxPrompt.Text;
+            if (ValidProxy(textBoxProxy.Text))
+            {
+                proxy = textBoxProxy.Text;
+            } else {
+                MessageBox.Show("Proxy 格式不正確", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (ValidOpenAIKey(textBoxOpenAIKey.Text))
+            {
+                openAIKey = textBoxOpenAIKey.Text;
+            }
+            else
+            {
+                MessageBox.Show("OpenAI Key 格式不正確", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (ValidPrompt(textBoxPrompt.Text))
+            {
+                prompt = textBoxPrompt.Text;
+            }
+            else
+            {
+                MessageBox.Show("Prompt 不能為空", "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             var config = new Dictionary<string, string>
             {
